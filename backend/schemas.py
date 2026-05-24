@@ -11,6 +11,7 @@ class DocumentListItem(BaseModel):
     uploaded_at: datetime = Field(..., description="Дата и время загрузки файла на сервер")
     total_pages: int = Field(..., description="Общее количество страниц в документе")
     processed_pages: int = Field(..., description="Количество успешно обработанных страниц")
+    encoder_name: str = Field(..., description="Используемый энкодер")
 
     class Config:
         from_attributes = True
@@ -38,3 +39,6 @@ class ChatResponse(BaseModel):
     answer: str = Field(..., description="Сгенерированный текстовый ответ от VLM")
     source_page: int = Field(..., description="Номер страницы, которая была признана наиболее релевантной")
     source_image_base64: str = Field(..., description="Строка Base64 с изображением страницы для рендера на фронтенде")
+    retrieval_time_sec: float = Field(..., description="Время поиска в БД (сек)")
+    vlm_time_sec: float = Field(..., description="Время ответа Gemini (сек)")
+    chunk_distance: float = Field(..., description="Косинусное расстояние (меньше = лучше)")

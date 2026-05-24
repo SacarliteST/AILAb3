@@ -2,14 +2,20 @@
 from sentence_transformers import SentenceTransformer
 from typing import List
 
-# bge-m3 выдает векторы размерностью 1024
-embedding_model = SentenceTransformer('BAAI/bge-m3')
+print("Загрузка моделей энкодеров в память")
+encoders = {
+    "bge-m3": SentenceTransformer('BAAI/bge-m3'),
+    "all-MiniLM-L6-v2": SentenceTransformer('all-MiniLM-L6-v2'),
+    "multilingual-e5-small": SentenceTransformer('intfloat/multilingual-e5-small')
+}
+print("Все модели успешно загружены!")
 
 
-def get_embedding(text: str) -> List[float]:
-    """Генерирует векторное представление (эмбеддинг) для текста."""
-    # Используем префикс запроса для лучшего поиска, если это короткий вопрос
-    return embedding_model.encode(text, normalize_embeddings=True).tolist()
+def get_embedding(text: str, encoder_name: str = "bge-m3") -> List[float]:
+    """Генерирует вектор выбранной моделью."""
+    model = encoders.get(encoder_name, encoders["bge-m3"])
+
+    return model.encode(text, normalize_embeddings=True).tolist()
 
 
 def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> List[str]:

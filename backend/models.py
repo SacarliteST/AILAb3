@@ -9,12 +9,13 @@ Base = declarative_base()
 
 
 class Document(Base):
-    """Модель PDF-документа с отслеживанием статуса фоновой обработки."""
     __tablename__ = 'documents'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     filename = Column(String, nullable=False)
     uploaded_at = Column(DateTime, default=datetime.utcnow)
+
+    encoder_name = Column(String, default="bge-m3", nullable=False)
 
     status = Column(String, default="processing")
     total_pages = Column(Integer, default=0)
@@ -25,12 +26,6 @@ class Document(Base):
 
 
 class Page(Base):
-    """
-    Модель страницы документа.
-
-    Хранит полный извлеченный текст и бинарные данные (BYTEA) отрендеренной
-    страницы в формате PNG для последующей передачи в VLM и на фронтенд.
-    """
     __tablename__ = 'pages'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -44,18 +39,12 @@ class Page(Base):
 
 
 class PageChunk(Base):
-    """
-    Модель текстового чанка страницы.
-
-    Хранит фрагмент текста страницы и его векторное представление для
-    семантического поиска. Размерность вектора по умолчанию задана под
-    стандартные embedding-модели (например, 1024 для bge-m3-large).
-    """
     __tablename__ = 'page_chunks'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     page_id = Column(UUID(as_uuid=True), ForeignKey('pages.id', ondelete='CASCADE'), nullable=False)
     chunk_text = Column(Text, nullable=False)
-    embedding = Column(Vector(1024), nullable=False)
+
+    embedding = Column(Vector, nullable=False)
 
     page = relationship("Page", back_populates="chunks")
